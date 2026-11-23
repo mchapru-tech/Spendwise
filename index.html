@@ -41,6 +41,7 @@
     <button class="nav" data-view="transactions"><span>↕</span> Transactions</button>
     <button class="nav" data-view="income"><span>＋</span> Add income</button>
     <button class="nav" data-view="budgets"><span>◎</span> Budgets</button>
+    <button class="nav" data-view="categories"><span>＋</span> Manage Categories</button>
     <button class="nav" data-view="assistant"><span>✳</span> Money assistant</button>
     <div class="sidebar-bottom"><div class="user-chip"><div class="avatar">₹</div><div class="user-meta"><b id="userEmail">Account</b><small>Personal workspace</small></div></div><button id="signOutBtn" class="signout">↪ Sign out</button></div>
   </aside>
@@ -65,7 +66,11 @@
 
     <section id="transactionsView" class="view hidden">
       <div class="section-intro"><div><h3>All transactions</h3><p class="muted">Search, filter, edit or remove your records.</p></div><button class="btn primary" id="addExpenseBtn">＋ Add expense</button></div>
-      <div class="filter-bar"><input id="searchInput" placeholder="Search description…"><select id="categoryFilter"><option value="all">All categories</option><option>House</option><option>Personal</option><option>Transportation</option><option>Cat</option><option>Food</option><option>Income</option></select><select id="periodFilter"><option value="month">This month</option><option value="week">This week</option><option value="day">Today</option><option value="all">All time</option></select><input id="customMonth" type="month" title="Choose month"></div>
+      <div class="filter-bar"><input id="searchInput" placeholder="Search description…">
+        <select id="categoryFilter">
+  <option value="all">All categories</option>
+</select>
+        <select id="periodFilter"><option value="month">This month</option><option value="week">This week</option><option value="day">Today</option><option value="all">All time</option></select><input id="customMonth" type="month" title="Choose month"></div>
       <div class="panel table-panel"><div id="transactionList"></div></div>
     </section>
 
@@ -80,6 +85,37 @@
       <div class="panel"><h3>Budget progress</h3><div id="budgetProgress"></div></div>
     </section>
 
+    <section id="categoriesView" class="view hidden">
+  <div class="section-intro">
+    <div>
+      <h3>Manage categories</h3>
+      <p class="muted">Add and manage the categories you use for your expenses.</p>
+    </div>
+  </div>
+ 
+  <div class="panel form-panel">
+    <h3>Add a new category</h3>
+    <p class="muted">Create categories such as Shopping, Medical, Travel or Education.</p>
+    <div class="category-add-form">
+      <input type="text" id="newCategoryName" placeholder="Enter category name" maxlength="30">
+      <button class="btn primary" id="addCategoryBtn">Add category</button>
+    </div>
+    <p id="categoryError" class="error"></p>
+  </div>
+ 
+  <div class="panel">
+    <h3>Active categories</h3>
+    <p class="muted">These categories will be available when adding expenses.</p>
+    <div id="activeCategoryList"></div>
+  </div>
+ 
+  <div class="panel">
+    <h3>Archived categories</h3>
+    <p class="muted">Archived categories are hidden from new expenses, but their old transactions are preserved.</p>
+    <div id="archivedCategoryList"></div>
+  </div>
+</section>
+
     <section id="assistantView" class="view hidden">
       <div class="section-intro"><div><h3>Your money assistant</h3><p class="muted">Ask for a summary or practical saving suggestions based on your recorded transactions.</p></div></div>
       <div class="panel chat-panel"><div class="chat-intro"><div class="assistant-icon">✳</div><div><b>SpendWise assistant</b><p class="muted">I can review your spending data and offer simple suggestions.</p></div></div><div id="chatMessages" class="chat-messages"><div class="chat-bubble bot">Hi! Ask me things like “Where did I spend the most this month?”, “How much did I save?” or “How can I reduce my expenses?”</div></div><div class="chat-suggestions"><button class="suggestion">Where did I spend the most?</button><button class="suggestion">How much did I save this month?</button><button class="suggestion">Give me saving tips</button></div><form id="chatForm" class="chat-input"><input id="chatText" placeholder="Ask about your spending…" autocomplete="off"><button class="btn primary">Send ↑</button></form><p class="tiny muted">This is an in-app rule-based assistant, not a live AI service or professional financial advice.</p></div>
@@ -90,13 +126,8 @@
 <div id="expenseModal" class="modal hidden"><div class="modal-card"><div class="modal-head"><div><p class="eyebrow">TRANSACTION</p><h3 id="modalTitle">Add expense</h3></div><button class="icon-btn" id="closeModal">×</button></div><form id="expenseForm">
   <input type="hidden" id="editId">
   <label class="field-label">Choose category</label>
-  <div class="category-options">
-    <label class="category-option"><input type="radio" name="category" value="House" checked><span>⌂</span>House</label>
-    <label class="category-option"><input type="radio" name="category" value="Personal"><span>◉</span>Personal</label>
-    <label class="category-option"><input type="radio" name="category" value="Transportation"><span>↗</span>Transport</label>
-    <label class="category-option"><input type="radio" name="category" value="Cat"><span>♡</span>Cat</label>
-    <label class="category-option"><input type="radio" name="category" value="Food"><span>♨</span>Food</label>
-  </div>
+<div class="category-options" id="categoryOptions">
+</div>
   <div class="field"><label>Amount (₹)</label><input id="expenseAmount" type="number" min="0.01" step="0.01" required placeholder="0.00"></div>
   <div class="field" id="descriptionField"><label>Description</label><input id="expenseDescription" placeholder="What did you spend on?"></div>
   <div class="field"><label>Date and time</label><input id="expenseDate" type="datetime-local" required></div>
