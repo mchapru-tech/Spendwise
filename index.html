@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101827"><title>SpendWise — Personal Finance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="authScreen" class="auth-wrap">
+  <div class="auth-card">
+    <div class="brand"><div class="brand-mark">S</div><span>spendwise</span></div>
+    <p class="eyebrow">YOUR PERSONAL FINANCE SPACE</p>
+    <h1>Make every rupee<br><span>count.</span></h1>
+    <p class="muted">Track spending, understand your habits and grow your savings.</p>
+    <div class="field"><label>Email address</label><input id="email" type="email" placeholder="you@example.com" autocomplete="email"></div>
+    <div class="field"><label>Password</label><input id="password" type="password" placeholder="At least 6 characters" autocomplete="current-password"></div>
+    <div class="auth-actions"><button class="btn primary" id="signInBtn">Sign in</button><button class="btn secondary" id="signUpBtn">Create account</button></div>
+    <p class="tiny muted">Your financial data is private to your account and stored in your Firebase cloud database.</p>
+    <p id="authError" class="error"></p>
+  </div>
+</div>
+
+<div id="setupScreen" class="auth-wrap hidden">
+  <div class="auth-card setup-card">
+    <div class="brand"><div class="brand-mark">S</div><span>spendwise</span></div>
+    <p class="eyebrow">FIRST-TIME SETUP</p><h1>Let's set your<br><span>starting balance.</span></h1>
+    <p class="muted">Enter the total money currently available in your account. We'll use this as your opening balance.</p>
+    <div class="field"><label>Current account balance (₹)</label><input id="openingBalance" type="number" min="0" step="0.01" placeholder="e.g. 25000"></div>
+    <button class="btn primary full" id="saveSetupBtn">Save and open dashboard</button>
+    <p id="setupError" class="error"></p>
+  </div>
+</div>
+
+<div id="app" class="app hidden">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark">S</div><span>spendwise</span></div>
+    <div class="side-label">WORKSPACE</div>
+    <button class="nav active" data-view="overview"><span>◫</span> Overview</button>
+    <button class="nav" data-view="transactions"><span>↕</span> Transactions</button>
+    <button class="nav" data-view="income"><span>＋</span> Add income</button>
+    <button class="nav" data-view="budgets"><span>◎</span> Budgets</button>
+    <button class="nav" data-view="assistant"><span>✳</span> Money assistant</button>
+    <div class="sidebar-bottom"><div class="user-chip"><div class="avatar">₹</div><div class="user-meta"><b id="userEmail">Account</b><small>Personal workspace</small></div></div><button id="signOutBtn" class="signout">↪ Sign out</button></div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar"><div><p class="eyebrow" id="todayLabel">PERSONAL FINANCE</p><h2 id="pageTitle">Overview</h2></div><div class="top-actions"><span class="sync-pill"><i></i> Cloud synced</span><button class="btn primary add-top" id="quickAddBtn">＋ Add expense</button></div></header>
+
+    <section id="overviewView" class="view">
+      <div class="welcome-row"><div><h3>Your money, in focus.</h3><p class="muted">Here's how your finances are looking.</p></div><div class="month-select"><label for="overviewMonth">REPORT MONTH</label><input id="overviewMonth" type="month"></div></div>
+      <div class="stats-grid">
+        <article class="stat-card balance-card"><div class="stat-top"><span>Available balance</span><span class="stat-icon">₹</span></div><div class="stat-value" id="balanceStat">₹0</div><div class="stat-foot">Opening balance + income − expenses</div></article>
+        <article class="stat-card"><div class="stat-top"><span>Income this month</span><span class="stat-icon green">↗</span></div><div class="stat-value" id="incomeStat">₹0</div><div class="stat-foot">Salary and other credits</div></article>
+        <article class="stat-card"><div class="stat-top"><span>Expenses this month</span><span class="stat-icon red">↘</span></div><div class="stat-value" id="expenseStat">₹0</div><div class="stat-foot" id="expenseFoot">Across all categories</div></article>
+        <article class="stat-card"><div class="stat-top"><span>Savings this month</span><span class="stat-icon purple">✧</span></div><div class="stat-value" id="savingStat">₹0</div><div class="stat-foot">Monthly income − expenses</div></article>
+      </div>
+      <div class="content-grid">
+        <article class="panel"><div class="panel-head"><div><h3>Spending by category</h3><p class="muted">Where your money went this month</p></div><span class="mini-tag" id="categoryMonthTag">This month</span></div><div id="categoryBreakdown" class="category-breakdown"></div></article>
+        <article class="panel"><div class="panel-head"><div><h3>Monthly comparison</h3><p class="muted">This month vs previous month</p></div></div><div class="compare" id="monthlyCompare"></div></article>
+      </div>
+      <article class="panel recent-panel"><div class="panel-head"><div><h3>Recent transactions</h3><p class="muted">Your latest money activity</p></div><button class="text-btn" data-goto="transactions">View all →</button></div><div id="recentTransactions"></div></article>
+    </section>
+
+    <section id="transactionsView" class="view hidden">
+      <div class="section-intro"><div><h3>All transactions</h3><p class="muted">Search, filter, edit or remove your records.</p></div><button class="btn primary" id="addExpenseBtn">＋ Add expense</button></div>
+      <div class="filter-bar"><input id="searchInput" placeholder="Search description…"><select id="categoryFilter"><option value="all">All categories</option><option>House</option><option>Personal</option><option>Transportation</option><option>Cat</option><option>Food</option><option>Income</option></select><select id="periodFilter"><option value="month">This month</option><option value="week">This week</option><option value="day">Today</option><option value="all">All time</option></select><input id="customMonth" type="month" title="Choose month"></div>
+      <div class="panel table-panel"><div id="transactionList"></div></div>
+    </section>
+
+    <section id="incomeView" class="view hidden">
+      <div class="section-intro"><div><h3>Add money received</h3><p class="muted">Record salary, reimbursements or any other credits.</p></div></div>
+      <div class="panel form-panel"><form id="incomeForm"><div class="form-grid"><div class="field"><label>Amount (₹)</label><input id="incomeAmount" type="number" min="0.01" step="0.01" required placeholder="0.00"></div><div class="field"><label>Income source</label><input id="incomeDescription" required placeholder="e.g. Monthly salary"></div><div class="field"><label>Date and time</label><input id="incomeDate" type="datetime-local" required></div></div><button class="btn primary">Save income</button></form></div>
+    </section>
+
+    <section id="budgetsView" class="view hidden">
+      <div class="section-intro"><div><h3>Monthly budgets</h3><p class="muted">Set spending limits and keep an eye on them.</p></div></div>
+      <div class="panel form-panel"><h3>Set category budgets</h3><p class="muted">Budget amounts are monthly limits, not expenses.</p><div id="budgetInputs" class="budget-inputs"></div><button class="btn primary" id="saveBudgetsBtn">Save budgets</button></div>
+      <div class="panel"><h3>Budget progress</h3><div id="budgetProgress"></div></div>
+    </section>
+
+    <section id="assistantView" class="view hidden">
+      <div class="section-intro"><div><h3>Your money assistant</h3><p class="muted">Ask for a summary or practical saving suggestions based on your recorded transactions.</p></div></div>
+      <div class="panel chat-panel"><div class="chat-intro"><div class="assistant-icon">✳</div><div><b>SpendWise assistant</b><p class="muted">I can review your spending data and offer simple suggestions.</p></div></div><div id="chatMessages" class="chat-messages"><div class="chat-bubble bot">Hi! Ask me things like “Where did I spend the most this month?”, “How much did I save?” or “How can I reduce my expenses?”</div></div><div class="chat-suggestions"><button class="suggestion">Where did I spend the most?</button><button class="suggestion">How much did I save this month?</button><button class="suggestion">Give me saving tips</button></div><form id="chatForm" class="chat-input"><input id="chatText" placeholder="Ask about your spending…" autocomplete="off"><button class="btn primary">Send ↑</button></form><p class="tiny muted">This is an in-app rule-based assistant, not a live AI service or professional financial advice.</p></div>
+    </section>
+  </main>
+</div>
+
+<div id="expenseModal" class="modal hidden"><div class="modal-card"><div class="modal-head"><div><p class="eyebrow">TRANSACTION</p><h3 id="modalTitle">Add expense</h3></div><button class="icon-btn" id="closeModal">×</button></div><form id="expenseForm">
+  <input type="hidden" id="editId">
+  <label class="field-label">Choose category</label>
+  <div class="category-options">
+    <label class="category-option"><input type="radio" name="category" value="House" checked><span>⌂</span>House</label>
+    <label class="category-option"><input type="radio" name="category" value="Personal"><span>◉</span>Personal</label>
+    <label class="category-option"><input type="radio" name="category" value="Transportation"><span>↗</span>Transport</label>
+    <label class="category-option"><input type="radio" name="category" value="Cat"><span>♡</span>Cat</label>
+    <label class="category-option"><input type="radio" name="category" value="Food"><span>♨</span>Food</label>
+  </div>
+  <div class="field"><label>Amount (₹)</label><input id="expenseAmount" type="number" min="0.01" step="0.01" required placeholder="0.00"></div>
+  <div class="field" id="descriptionField"><label>Description</label><input id="expenseDescription" placeholder="What did you spend on?"></div>
+  <div class="field"><label>Date and time</label><input id="expenseDate" type="datetime-local" required></div>
+  <button class="btn primary full" id="saveExpenseBtn">Save expense</button><p id="expenseError" class="error"></p>
+</form></div></div>
+<div id="toast" class="toast"></div>
+<script type="module" src="app.js"></script>
+</body></html>
